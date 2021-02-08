@@ -17,11 +17,21 @@ from carla import VehicleLightState as vls
 import argparse
 import logging
 from carla import Transform, Location, Rotation, AttachmentType
-from weatherList import *
+from utils.weatherList import *
+from utils.spawnClosestTo import *
 
 weather = weather_lightRain_30deg
 
+V1_t = Transform(Location(x=4.503611, y=30.677336, z=1.495204), Rotation(pitch=3.871590, yaw=-82.755234, roll=-0.000122))
+V2_t = Transform(Location(x=1.972299, y=57.928772, z=1.107717), Rotation(pitch=1.554264, yaw=-85.449158, roll=-0.000122))
+V3_t = Transform(Location(x=-21.551464, y=7.175428, z=1.506268), Rotation(pitch=0.165127, yaw=54.112213, roll=-0.000122))
+sensors_t = Transform(Location(x=0, y=0, z=13.0), Rotation(pitch=-20, yaw=90, roll=0)) # Position of the sensors of the infrastructure
+embed_sens_t = Transform(Location(x=0, y=0, z=1.9)) # position of the sensors on the vehicle
+
+
 synchronous_master = False
+nObservers = 4 # 3 cars + 1 infrastructure
+tps = nObservers * 0.16 # we plan 0.16 seconds of computation for one observer (3 cam + 1 LiDAR)
 
 def main():
 
@@ -29,80 +39,47 @@ def main():
 
     logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
 
-
+    # connect to the client
     client = carla.Client('localhost', 2000)    # Parameters of the CARLA server
     client.set_timeout(10.0)                    # Timeout to connect to the server
 
-    print('You are connected to the simulator.')
-
     
-
-    V1_t = Transform(Location(x=4.503611, y=30.677336, z=1.495204), Rotation(pitch=3.871590, yaw=-82.755234, roll=-0.000122))
-    V2_t = Transform(Location(x=1.972299, y=57.928772, z=1.107717), Rotation(pitch=1.554264, yaw=-85.449158, roll=-0.000122))
-    V3_t = Transform(Location(x=-21.551464, y=7.175428, z=1.506268), Rotation(pitch=0.165127, yaw=54.112213, roll=-0.000122))
-    sensors_t = Transform(Location(x=0, y=0, z=13.0), Rotation(pitch=-20, yaw=90, roll=0))
-    embed_sens_t = Transform(Location(x=0, y=0, z=1.9))
-
     actor_list = []
     spawn_points = []
 
     try: 
+        # Get the world
         world = client.get_world()
+
+        # Settup the traffic manager
         traffic_manager = client.get_trafficmanager(8000)
         traffic_manager.set_global_distance_to_leading_vehicle(1.0)
         
+        # Place the spectator camera (to disable in headless mode)
         spectator = world.get_spectator()
         spectator.set_transform(sensors_t)
 
-        V1_spawn_idx = -1
-        V2_spawn_idx = -1
-        V3_spawn_idx = -1
+        # Find the closest spawn points at the roundabout
+        spawn_points.append(spawArround(world, V1_t))         
+        spawn_points.append(spawArround(world, V2_t))         
+        spawn_points.append(spawArround(world, V3_t))         
+        for t in spawn_points:
+            print(t)
 
-        last_dist = 9999
-        for idx, t in enumerate(world.get_map().get_spawn_points()):
-            if t.rotation.yaw > (V1_t.rotation.yaw-25) and t.rotation.yaw < (V1_t.rotation.yaw+25):
-                if last_dist > V1_t.location.distance(t.location):
-                    last_dist = V1_t.location.distance(t.location)
-                    V1_spawn_idx = idx
-        print("V1 :   %d - %dm:"%(V1_spawn_idx, last_dist))   
-        spawn_points.append(world.get_map().get_spawn_points()[V1_spawn_idx])         
-        print(spawn_points[0])
-        
-
-        last_dist = 9999
-        for idx, t in enumerate(world.get_map().get_spawn_points()):
-            if t.rotation.yaw > (V2_t.rotation.yaw-10) and t.rotation.yaw < (V2_t.rotation.yaw+10):
-                if last_dist > V2_t.location.distance(t.location):
-                    last_dist = V2_t.location.distance(t.location)
-                    V2_spawn_idx = idx
-        print("V1 :   %d - %dm:"%(V2_spawn_idx, last_dist))            
-        spawn_points.append(world.get_map().get_spawn_points()[V2_spawn_idx])         
-        print(spawn_points[1])
-
-        last_dist = 9999
-        for idx, t in enumerate(world.get_map().get_spawn_points()):
-            if t.rotation.yaw > (V3_t.rotation.yaw-10) and t.rotation.yaw < (V3_t.rotation.yaw+10):
-                if last_dist > V3_t.location.distance(t.location):
-                    last_dist = V3_t.location.distance(t.location)
-                    V3_spawn_idx = idx
-        print("V1 :   %d - %dm:"%(V3_spawn_idx, last_dist))            
-        spawn_points.append(world.get_map().get_spawn_points()[V3_spawn_idx])         
-        print(spawn_points[2])
-
-
+        # Find the vehicle's blueprints
         blueprint_library = world.get_blueprint_library()
-        bps = []
-        bps.append(blueprint_library.filter('vehicle.citroen.c3')[0])
-        bps.append(blueprint_library.filter('vehicle.tesla.model3')[0])
-        bps.append(blueprint_library.filter('vehicle.audi.a2')[0])
-        for x in bps:
-            print(x)
+        c3 = blueprint_library.filter('vehicle.citroen.c3')[0]
+        model3 = blueprint_library.filter('vehicle.tesla.model3')[0]
+        a2 = blueprint_library.filter('vehicle.audi.a2')[0]
+        bps = [c3, model3, a2]
 
+        # Setup CARLA wizardry
         SpawnActor = carla.command.SpawnActor
         SetAutopilot = carla.command.SetAutopilot
         SetVehicleLightState = carla.command.SetVehicleLightState
         FutureActor = carla.command.FutureActor
 
+        # Spawning a batch of vehicles
         batch = []
         for n, transform in enumerate(spawn_points):
             print(n)
@@ -130,6 +107,8 @@ def main():
                 logging.error(response.error)
             else:
                 actor_list.append(response.actor_id)
+
+        # setup the sensor's blueprints
 
         camera_bp = blueprint_library.find('sensor.camera.rgb')
         # camera_bp.set_attribute('image_size_x', '1920')
