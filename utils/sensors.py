@@ -88,9 +88,6 @@ def get_KOPERcamWide_bp(blueprint_library):
     camera.set_attribute('fov', '125')
     return camera
 
-def get_KOPERcamOmni_bp(blueprint_library):
-    camera = blueprint_library.find('sensor.camera.rgb')
-    camera.set_attribute('image_size_x', '656')
 
 
 ## Depth
@@ -137,9 +134,6 @@ def get_KOPERcamWideDepth_bp(blueprint_library):
     camera.set_attribute('fov', '125')
     return camera
 
-def get_KOPERcamOmniDepth_bp(blueprint_library):
-    camera = blueprint_library.find('sensor.camera.depth')
-    camera.set_attribute('image_size_x', '656')
 
 ## segm
 
@@ -185,6 +179,11 @@ def get_KOPERcamWideSem_bp(blueprint_library):
     camera.set_attribute('fov', '125')
     return camera
 
-def get_KOPERcamOmniSem_bp(blueprint_library):
-    camera = blueprint_library.find('sensor.camera.semantic_segmentation')
-    camera.set_attribute('image_size_x', '656')
+# Other sensors
+def get_GNSS(blueprint_library):
+    gnss = blueprint_library.find('sensor.other.gnss')
+    return gnss
+
+def get_IMU(blueprint_library):
+    imu = blueprint_library.find('sensor.other.imu')
+    return imu

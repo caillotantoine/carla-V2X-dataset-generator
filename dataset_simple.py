@@ -1,6 +1,7 @@
 import glob
 import os
 import sys
+import time
 
 # Import CARLA from the egg
 try:
@@ -22,7 +23,7 @@ from utils.spawnClosestTo import *
 from utils.spawnSensors import *
 from utils.sensors import *
 
-weather = weather_lightRain_30deg
+weather = weather_clear_noon
 
 vehicle_spawn_pts = []
 vehicle_spawn_pts.append(Transform(Location(x=4.503611, y=30.677336, z=1.495204), Rotation(pitch=3.871590, yaw=-82.755234, roll=-0.000122)))
@@ -32,9 +33,9 @@ sensors_t = Transform(Location(x=0, y=0, z=13.0), Rotation(pitch=-20, yaw=90, ro
 embed_sens_t = Transform(Location(x=0, y=0, z=1.9)) # position of the sensors on the vehicle
 
 
-synchronous_master = False
 nObservers = 4 # 3 cars + 1 infrastructure
-tps = nObservers * 0.16 # we plan 0.16 seconds of computation for one observer (3 cam + 1 LiDAR)
+tps = nObservers * 0.8 # we plan 0.3 seconds of computation for one observer (3 cam + 1 LiDAR + fichiers txt)
+ips = 20.0
 
 def main():
 
@@ -50,13 +51,29 @@ def main():
     actor_list = []
     spawn_points = []
 
+    synchronous_master = False
     try: 
         # Get the world
         world = client.get_world()
+        world.set_weather(weather)
 
         # Settup the traffic manager
         traffic_manager = client.get_trafficmanager(8000)
         traffic_manager.set_global_distance_to_leading_vehicle(1.0)
+
+        settings = world.get_settings()
+        
+        # Setting up the synchronous mode
+        traffic_manager.set_synchronous_mode(True)
+        if not settings.synchronous_mode:
+            synchronous_master = True
+            settings.synchronous_mode = True
+            settings.fixed_delta_seconds = 1.0/ips
+            print("Synchronous mode activated")
+        else:
+            synchronous_master = False
+            print("Already in synchronous mode")
+        world.apply_settings(settings)
         
         # Place the spectator camera (to disable in headless mode)
         spectator = world.get_spectator()
@@ -85,8 +102,6 @@ def main():
         # Spawning a batch of vehicles
         batch = []
         for n, transform in enumerate(spawn_points):
-            print(n)
-            print(bps[n])
             blueprint = bps[n]
             print(blueprint)
             if blueprint.has_attribute('color'):
@@ -113,18 +128,26 @@ def main():
 
         # Capteus des vehicules
         V_sensors = []
-        for i,actor in enumerate(actor_list):
-            V_sensors.append(spawnSensors(world, actor_list, "output/Embed/V%d"%i, embed_sens_t, world.get_actor(actor)))
+        print(actor_list)
+        for i in range(len(vehicle_spawn_pts)):
+            V_sensors.append(spawnSensors(world, actor_list, "output/Embed/V%d"%i, embed_sens_t, world.get_actor(actor_list[i])))
 
         # Capteurs de l'infrastructure
         infra_sensors = spawnSensors(world, actor_list, 'output/Infra', sensors_t, None)
         
         # Infinite loop to wait the end of the world
         print('Press Ctrl + C to quit')
+        time_computed = 0.0
         while True:
                 # print(V1.get_transform())
                 #spectator.set_transform(V1.get_transform())
-                world.wait_for_tick()
+                if synchronous_master:
+                    world.tick()
+                    time.sleep(tps)
+                    time_computed = time_computed + (1.0/ips)
+                    print("Seconds computed : %f" % time_computed)
+                else:
+                    world.wait_for_tick()
 
     finally:
         print('Destroying Actors')
