@@ -32,6 +32,7 @@ vehicle_spawn_pts.append(Transform(Location(x=-21.551464, y=7.175428, z=1.506268
 sensors_t = Transform(Location(x=0, y=0, z=13.0), Rotation(pitch=-20, yaw=90, roll=0)) # Position of the sensors of the infrastructure
 embed_sens_t = Transform(Location(x=0, y=0, z=1.9)) # position of the sensors on the vehicle
 
+print(sensors_t.get_matrix())
 
 nObservers = 4 # 3 cars + 1 infrastructure
 tps = nObservers * 0.8 # we plan 0.3 seconds of computation for one observer (3 cam + 1 LiDAR + fichiers txt)
