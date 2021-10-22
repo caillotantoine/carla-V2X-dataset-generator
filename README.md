@@ -1,9 +1,7 @@
 # carla-V2X-dataset-generator
 Create dataset from carla with an infrastructure and vehicles transiting. 
 
-
 ## Requirements
-
 To run the scripts, it is required to have CARLA (version 0.9.12 or higher) running either on your local machine or on a server. 
 Running CARLA on Linux requires a workarround to indicate the GPU to use : `./CarlaUE4.sh -prefernvidia` .
 
@@ -19,3 +17,6 @@ To update the pip version:
 The list of package used:
 
 - [ ] carla
+
+## Scripts 
+Script to run...
