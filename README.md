@@ -17,6 +17,8 @@ To update the pip version:
 The list of package used:
 
 - [ ] carla
+- [ ] tqdm
+- [ ] numpy
 
 ## Scripts 
 Script to run...

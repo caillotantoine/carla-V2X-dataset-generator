@@ -1,18 +1,4 @@
-import glob
-import os
-import sys
-
-# Import de CARLA depuis le egg
-try:
-    sys.path.append(glob.glob('../carla/dist/carla-*%d.%d-%s.egg' % (
-        sys.version_info.major,
-        sys.version_info.minor,
-        'win-amd64' if os.name == 'nt' else 'linux-x86_64'))[0])
-except IndexError:
-    pass
-
 import carla
-import random
 
 weather_clear_dusk = carla.WeatherParameters(cloudiness=0.0, precipitation=0.0, precipitation_deposits=0.0, sun_altitude_angle=-5.0, sun_azimuth_angle=0.0)
 weather_clear_sunrise = carla.WeatherParameters(cloudiness=0.0, precipitation=0.0, precipitation_deposits=0.0, sun_altitude_angle=10.0, sun_azimuth_angle=10.0)
