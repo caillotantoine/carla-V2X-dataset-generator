@@ -18,4 +18,4 @@ To update the pip version:
 
 The list of package used:
 
-- [] carla
+- [ ] carla
