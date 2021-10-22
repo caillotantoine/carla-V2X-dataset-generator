@@ -130,3 +130,5 @@ dmypy.json
 
 # Output data
 output/
+
+carla_venv/
