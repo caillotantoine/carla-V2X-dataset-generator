@@ -81,10 +81,12 @@ def main():
         blueprint.set_attribute('role_name', 'autopilot')
 
         camera_bp = get_KITTIcam_bp(blueprint_library)
+        cameraSem_bp = get_KITTIcamSem_bp(blueprint_library)
 
         v_attrib = Attribute(transform, blueprint, "output/")
         s_attrib = []
         s_attrib.append(Attribute(sensors_t, camera_bp, "output/"))
+        s_attrib.append(Attribute(sensors_t, cameraSem_bp, "output/"))
         agents.append(Agent("vehicle", n, v_attrib, s_attrib))
 
     
