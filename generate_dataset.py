@@ -4,11 +4,13 @@ from carla import VehicleLightState as vls
 from tqdm import tqdm
 import random
 import time
+from typing import List
 
 from utils.weatherList import *
 from utils.spawnClosestTo import *
 from utils.spawnSensors import *
 from utils.sensors import *
+from utils.Agent import *
 
 TPS = 1.0/30.0
 DURATION = 15.0
@@ -50,12 +52,6 @@ def main():
         traffic_manager.set_synchronous_mode(True)
 
         world.apply_settings(settings)
-
-        # Setup CARLA wizardry
-        SpawnActor = carla.command.SpawnActor
-        SetAutopilot = carla.command.SetAutopilot
-        SetVehicleLightState = carla.command.SetVehicleLightState
-        FutureActor = carla.command.FutureActor
     except Exception as e:
         print("Setting up world failled.\n{}".format(e))
         exit()
@@ -72,7 +68,7 @@ def main():
     a2 = blueprint_library.filter('vehicle.audi.a2')[0]
     bps = [c3, model3, a2]
 
-    batch = []
+    agents:list[Agent] = []
     for n, transform in enumerate(spawn_points):
         blueprint = bps[n]
         print(blueprint)
@@ -84,19 +80,17 @@ def main():
             blueprint.set_attribute('driver_id', driver_id)
         blueprint.set_attribute('role_name', 'autopilot')
 
-        # prepare the light state of the cars to spawn
-        light_state = vls.NONE
+        camera_bp = get_KITTIcam_bp(blueprint_library)
 
-        # spawn the cars and set their autopilot and light state all together
-        batch.append(SpawnActor(blueprint, transform)
-            .then(SetAutopilot(FutureActor, True, traffic_manager.get_port()))
-            .then(SetVehicleLightState(FutureActor, light_state)))
+        v_attrib = Attribute(transform, blueprint, "output/")
+        s_attrib = []
+        s_attrib.append(Attribute(sensors_t, camera_bp, "output/"))
+        agents.append(Agent("vehicle", n, v_attrib, s_attrib))
 
-    for response in client.apply_batch_sync(batch, True):
-        if response.error:
-            print("Error spawning... {}".format(response.error))
-        else:
-            actor_list.append(response.actor_id)
+    
+    for agent in agents:
+        actor_list = actor_list + agent.spawn(world)
+        print(agent.get_actors_list())
 
     # # Vehicles' sensors
     # V_sensors = []
@@ -116,13 +110,15 @@ def main():
             world.tick()
             actors = world.get_actors(actor_list)
             for actor in actors:
-                print(actor.type_id.find("vehicle") != -1)
-            time.sleep(0.2)
+                pass
+                # print(actor.type_id.find("vehicle") != -1)
+            # time.sleep(0.2)
     finally:
         client.apply_batch([carla.command.DestroyActor(x) for x in actor_list])
         settings.synchronous_mode = False
         traffic_manager.set_synchronous_mode(False)
         world.apply_settings(settings)
+        
     
 
 if __name__ == '__main__':
