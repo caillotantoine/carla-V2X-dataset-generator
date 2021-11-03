@@ -9,7 +9,7 @@ import json
 import os
 
 class Attribute:
-    def __init__(self, pose: Transform, bp, save_path: str, color_converter=carla.ColorConverter.Raw):
+    def __init__(self, pose: Transform, bp, save_path: str, color_converter=carla.ColorConverter.Raw, maxspeed:float=0.0):
         self.pose = pose
         self.bp = bp
         self.save_path = save_path
@@ -17,20 +17,31 @@ class Attribute:
         self.actor = None
         self.color_conv = color_converter
         self.types = self.bp.id.split('.')
+        self.maxspeed = maxspeed
         if self.types[0] == 'sensor':
             self.save_path = self.save_path + self.types[1] + '_' + self.types[2] + '/'
         if self.types[0] == 'vehicle':
             self.save_path = self.save_path + "infos/"
     
     def spawn(self, world:carla.World, autopilot=None, attach_to=None, to_save:queue.Queue=None) -> None:
+        if self.types[0] == 'controller':
+            world.tick()
         try:
             actor = world.spawn_actor(self.bp, self.pose, attach_to=attach_to)
-            if autopilot != None:
-                actor.set_autopilot(autopilot)
-            if to_save != None:
+            if self.types[0] == 'vehicle':
+                if autopilot != None:
+                    actor.set_autopilot(autopilot)
+            if self.types[0] != 'controller' and to_save != None:
                 actor.listen(lambda data: to_save.put((self, data)))
+            if self.types[0] == 'controller':
+                actor.start()
+                actor.go_to_location(world.get_random_location_from_navigation())
+                # actor.set_max_speed(self.maxspeed)
             self.actor = actor
-            self.actor_id = actor.id
+            if self.types[0] != 'controller':
+                self.actor_id = actor.id
+            else:
+                self.actor_id = None
         except Exception as e:
             print("Exception spawning actor : {}".format(e))
 
@@ -71,7 +82,10 @@ class Attribute:
         return self.actor
 
     def get_transform(self):
-        return self.actor.get_transform().get_matrix()
+        if self.types[0] != 'walker':
+            return self.actor.get_transform().get_matrix()
+        # return np.identity(4)
+        return None
 
     def get_geoloc(self, world):
         return world.get_map().transform_to_geolocation(self.actor.get_location())
@@ -101,9 +115,10 @@ class Agent:
             self.vehicle.spawn(world, autopilot=True)
             parent = self.vehicle.get_actor()
             actors_id.append(self.vehicle.get_actor_id())
-        for sensor in self.sensors:                                             # Bug potentiel. Est-ce une référence? Une copie de la variable? 
-            sensor.spawn(world, attach_to=parent, to_save=saving_queue)         # Si bug -> fix avec un enumerate
-            actors_id.append(sensor.get_actor_id())
+        if self.sensors != None:
+            for sensor in self.sensors:                                             # Bug potentiel. Est-ce une référence? Une copie de la variable? 
+                sensor.spawn(world, attach_to=parent, to_save=saving_queue)         # Si bug -> fix avec un enumerate
+                actors_id.append(sensor.get_actor_id())
         return actors_id
 
     def get_actors_list(self) -> List[int]:
@@ -131,7 +146,6 @@ class Agent:
                 T = s.get_transform()
                 sensors.append({'idx': n, "T_Mat": T})
 
-        
         if vehicle != None:
             out = {"vehicle": vehicle, "sensors": sensors}
         else:
@@ -149,6 +163,4 @@ class Agent:
         f.close()
 
 if __name__ == '__main__':
-    test = Agent("None", 0)
-    v = test.get_vehicle()
-    print(v)
+    pass

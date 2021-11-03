@@ -1,3 +1,5 @@
+import math
+from os import environ, error
 import carla
 from carla import Transform, Location, Rotation
 from carla import VehicleLightState as vls
@@ -12,6 +14,7 @@ from utils.spawnClosestTo import *
 from utils.spawnSensors import *
 from utils.sensors import *
 from utils.Agent import *
+from utils.Zone import *
 
 TPS = 1.0/30.0
 DURATION = 15.0
@@ -21,10 +24,12 @@ WORLD = 'Town03'
 
 vehicle_spawn_pts = []
 embed_sens_t = Transform(Location(x=0, y=0, z=1.9)) # position of the sensors on the vehicle
-vehicle_spawn_pts.append(Transform(Location(x=4.503611, y=30.677336, z=1.495204), Rotation(pitch=3.871590, yaw=-82.755234, roll=-0.000122)))
-vehicle_spawn_pts.append(Transform(Location(x=1.972299, y=57.928772, z=1.107717), Rotation(pitch=1.554264, yaw=-85.449158, roll=-0.000122)))
-vehicle_spawn_pts.append(Transform(Location(x=-21.551464, y=7.175428, z=1.506268), Rotation(pitch=0.165127, yaw=54.112213, roll=-0.000122)))
+# vehicle_spawn_pts.append(Transform(Location(x=4.503611, y=30.677336, z=1.495204), Rotation(pitch=3.871590, yaw=-82.755234, roll=-0.000122)))
+# vehicle_spawn_pts.append(Transform(Location(x=1.972299, y=57.928772, z=1.107717), Rotation(pitch=1.554264, yaw=-85.449158, roll=-0.000122)))
+# vehicle_spawn_pts.append(Transform(Location(x=-21.551464, y=7.175428, z=1.506268), Rotation(pitch=0.165127, yaw=54.112213, roll=-0.000122)))
 
+pedestrian_spawn_pts = []
+pedestrian_spawn_pts.append(Transform(Location(x=-18.057878, y=32.290249, z=2.474842), Rotation(pitch=1.811482, yaw=90.618484, roll=0.000001)))
 
 infra_spawn_pts = [] # Position of the sensors of the infrastructure
 infra_spawn_pts.append(Transform(Location(x=0, y=0, z=13.0), Rotation(pitch=-20, yaw=90, roll=0)))
@@ -43,12 +48,16 @@ def main():
     output_queue = queue.Queue()
     FIRST_hjvgckfhxddts = True
 
+    ROI = Zone(-120.0, 120.0, -120.0, 120.0)
+    # print(ROI.is_in_zone(vehicle_spawn_pts[0]))
+    
+
     try:
         world = client.get_world()
         world = client.load_world(WORLD) # Setting the world
 
-        # spectator = world.get_spectator()
-        # spectator.set_transform(sensors_t)
+        spectator = world.get_spectator()
+        spectator.set_transform(infra_spawn_pts[0])
 
         traffic_manager = client.get_trafficmanager()
 
@@ -59,12 +68,16 @@ def main():
         traffic_manager.set_synchronous_mode(True)
 
         world.apply_settings(settings)
+
+
     except Exception as e:
         print("Setting up world failled.\n{}".format(e))
         exit()
 
+    print(ROI.get_Nrandom_spawnpoints(world, 10))
+
     for v_spwn_pt in vehicle_spawn_pts:
-        spawn_points.append(spawArround(world, v_spwn_pt))
+        spawn_points.append(ROI.get_closest_spawnpoint(world, v_spwn_pt))
     for t in spawn_points:
         print(t)
 
@@ -102,9 +115,21 @@ def main():
         s_attrib = []
         s_attrib.append(Attribute(transform, camera_bp, "output/I%03d/"%n))
         s_attrib.append(Attribute(transform, cameraSem_bp, "output/I%03d/"%n))
-        agents.append(Agent("infrastructure", n, "output/I%03d/"%n, None, s_attrib))
+        agents.append(Agent("infrastructure", n, "output/I%03d/"%n, sensors=s_attrib))
 
-
+    for n, transform in enumerate(pedestrian_spawn_pts):
+        walker_bp = random.choice(blueprint_library.filter('walker.*.*'))
+        walker_controller_bp = world.get_blueprint_library().find('controller.ai.walker')
+        if walker_bp.has_attribute('is_invincible'):
+            walker_bp.set_attribute('is_invincible', 'false')
+        if walker_bp.has_attribute('speed'):
+            walker_speed = walker_bp.get_attribute('speed').recommended_values[1]
+        else:
+            walker_speed = 0.0
+        v_attrib = Attribute(transform, walker_bp, "output/P%03d/"%n)
+        s_attrib = []
+        s_attrib.append(Attribute(Transform(), walker_controller_bp, "output/P%03d/"%n, maxspeed=walker_speed))
+        agents.append(Agent("pedestrian", n, "output/P%03d/"%n, vehicle=v_attrib, sensors=s_attrib))
     
     for agent in agents:
         actor_list = actor_list + agent.spawn(world, output_queue)
@@ -113,7 +138,7 @@ def main():
     print("===========================\n\tRendering....\n===========================")
     try:
         for frame in tqdm(range(NFRAME)):
-            actors = world.get_actors(actor_list)
+            # actors = world.get_actors(actor_list)
 
             # print("Queue size : {}, empty : {}".format(output_queue.qsize(), output_queue.empty()))
             snapshots = []
@@ -135,6 +160,8 @@ def main():
                 # (attrib, data) = output_queue.clear()
             #     attrib.save(data, frame)
             # time.sleep(0.2)
+    except Exception as e:
+        print(f"Error {e}")
     finally:
         client.apply_batch([carla.command.DestroyActor(x) for x in actor_list])
         settings.synchronous_mode = False
