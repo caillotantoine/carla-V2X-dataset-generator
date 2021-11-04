@@ -1,0 +1,587 @@
+{
+    "world": "Town03",
+    "duration": 15,
+    "tps": 0.03333333333333333,
+    "agents": [
+        {
+            "type": "vehicle",
+            "position": {
+                "location": {
+                    "x": 124.70004272460938,
+                    "y": 59.00621795654297,
+                    "z": 0.27530714869499207
+                },
+                "rotation": {
+                    "pitch": 0,
+                    "yaw": 179.85255432128906,
+                    "roll": 0
+                }
+            },
+            "blueprint": {
+                "id": "vehicle.nissan.patrol"
+            }
+        },
+        {
+            "type": "vehicle",
+            "position": {
+                "location": {
+                    "x": 8.044854164123535,
+                    "y": -34.28064727783203,
+                    "z": 0.27530714869499207
+                },
+                "rotation": {
+                    "pitch": 0,
+                    "yaw": -108.03324890136719,
+                    "roll": 0
+                }
+            },
+            "blueprint": {
+                "id": "vehicle.harley-davidson.low_rider"
+            }
+        },
+        {
+            "type": "vehicle",
+            "position": {
+                "location": {
+                    "x": 4.104583263397217,
+                    "y": -46.1159553527832,
+                    "z": 0.27530714869499207
+                },
+                "rotation": {
+                    "pitch": 0,
+                    "yaw": -88.58641815185547,
+                    "roll": 0
+                }
+            },
+            "blueprint": {
+                "id": "vehicle.nissan.patrol_2021"
+            }
+        },
+        {
+            "type": "vehicle",
+            "position": {
+                "location": {
+                    "x": -26.262718200683594,
+                    "y": -7.955658435821533,
+                    "z": 0.27530714869499207
+                },
+                "rotation": {
+                    "pitch": 0,
+                    "yaw": 143.07748413085938,
+                    "roll": 0
+                }
+            },
+            "blueprint": {
+                "id": "vehicle.citroen.c3"
+            }
+        },
+        {
+            "type": "vehicle",
+            "position": {
+                "location": {
+                    "x": -6.446169853210449,
+                    "y": -42.19375228881836,
+                    "z": 0.27530714869499207
+                },
+                "rotation": {
+                    "pitch": 0,
+                    "yaw": 92.00418853759766,
+                    "roll": 0
+                }
+            },
+            "blueprint": {
+                "id": "vehicle.dodge.charger_police_2020"
+            }
+        },
+        {
+            "type": "vehicle",
+            "position": {
+                "location": {
+                    "x": -42.350990295410156,
+                    "y": -2.835118293762207,
+                    "z": 0.27530714869499207
+                },
+                "rotation": {
+                    "pitch": 0,
+                    "yaw": -179.70538330078125,
+                    "roll": 0
+                }
+            },
+            "blueprint": {
+                "id": "vehicle.toyota.prius"
+            }
+        },
+        {
+            "type": "vehicle",
+            "position": {
+                "location": {
+                    "x": -40.41106414794922,
+                    "y": 0.6854625344276428,
+                    "z": 0.27530714869499207
+                },
+                "rotation": {
+                    "pitch": 0,
+                    "yaw": 1.6669405698776245,
+                    "roll": 0
+                }
+            },
+            "blueprint": {
+                "id": "vehicle.audi.tt"
+            }
+        },
+        {
+            "type": "vehicle",
+            "position": {
+                "location": {
+                    "x": -20.467727661132812,
+                    "y": 0.3515026867389679,
+                    "z": 0.27530714869499207
+                },
+                "rotation": {
+                    "pitch": 0,
+                    "yaw": 81.80699920654297,
+                    "roll": 0
+                }
+            },
+            "blueprint": {
+                "id": "vehicle.tesla.cybertruck"
+            }
+        },
+        {
+            "type": "vehicle",
+            "position": {
+                "location": {
+                    "x": -10.648787498474121,
+                    "y": 34.00116729736328,
+                    "z": 0.27530714869499207
+                },
+                "rotation": {
+                    "pitch": 0,
+                    "yaw": 98.62480163574219,
+                    "roll": 0
+                }
+            },
+            "blueprint": {
+                "id": "vehicle.ford.ambulance"
+            }
+        },
+        {
+            "type": "vehicle",
+            "position": {
+                "location": {
+                    "x": 1.426758050918579,
+                    "y": 47.21087646484375,
+                    "z": 0.27530714869499207
+                },
+                "rotation": {
+                    "pitch": 0,
+                    "yaw": -88.8912353515625,
+                    "roll": 0
+                }
+            },
+            "blueprint": {
+                "id": "vehicle.gazelle.omafiets"
+            }
+        },
+        {
+            "type": "vehicle",
+            "position": {
+                "location": {
+                    "x": 4.926102638244629,
+                    "y": 40.57860565185547,
+                    "z": 0.27530714869499207
+                },
+                "rotation": {
+                    "pitch": 0,
+                    "yaw": -88.8912353515625,
+                    "roll": 0
+                }
+            },
+            "blueprint": {
+                "id": "vehicle.nissan.micra"
+            }
+        },
+        {
+            "type": "vehicle",
+            "position": {
+                "location": {
+                    "x": 26.509408950805664,
+                    "y": 7.425339698791504,
+                    "z": 0.27530714869499207
+                },
+                "rotation": {
+                    "pitch": 0,
+                    "yaw": -13.668415069580078,
+                    "roll": 0
+                }
+            },
+            "blueprint": {
+                "id": "vehicle.lincoln.mkz_2020"
+            }
+        },
+        {
+            "type": "vehicle",
+            "position": {
+                "location": {
+                    "x": 35.54818344116211,
+                    "y": -7.843905448913574,
+                    "z": 0.27530714869499207
+                },
+                "rotation": {
+                    "pitch": 0,
+                    "yaw": -179.1441650390625,
+                    "roll": 0
+                }
+            },
+            "blueprint": {
+                "id": "vehicle.mercedes.coupe_2020"
+            }
+        },
+        {
+            "type": "vehicle",
+            "position": {
+                "location": {
+                    "x": 64.26287078857422,
+                    "y": -7.414976596832275,
+                    "z": 0.44999998807907104
+                },
+                "rotation": {
+                    "pitch": 0,
+                    "yaw": -179.1441650390625,
+                    "roll": 0
+                }
+            },
+            "blueprint": {
+                "id": "vehicle.carlamotors.carlacola"
+            }
+        },
+        {
+            "type": "vehicle",
+            "position": {
+                "location": {
+                    "x": 56.96175765991211,
+                    "y": -4.2785749435424805,
+                    "z": 0.27530714869499207
+                },
+                "rotation": {
+                    "pitch": 0,
+                    "yaw": -179.1441650390625,
+                    "roll": 0
+                }
+            },
+            "blueprint": {
+                "id": "vehicle.diamondback.century"
+            }
+        },
+        {
+            "type": "vehicle",
+            "position": {
+                "location": {
+                    "x": -60.5035400390625,
+                    "y": 187.43173217773438,
+                    "z": 0.27530714869499207
+                },
+                "rotation": {
+                    "pitch": 0,
+                    "yaw": -144.4464111328125,
+                    "roll": 0
+                }
+            },
+            "blueprint": {
+                "id": "vehicle.mini.cooper_s_2021"
+            }
+        },
+        {
+            "type": "pedestrian",
+            "position": {
+                "location": {
+                    "x": -18.35718536376953,
+                    "y": 32.05318832397461,
+                    "z": 1.9927607774734497
+                },
+                "rotation": {
+                    "pitch": -2.819242477416992,
+                    "yaw": 82.17498779296875,
+                    "roll": 0.00010300438589183614
+                }
+            },
+            "blueprint": {
+                "id": "walker.pedestrian.0021"
+            }
+        },
+        {
+            "type": "pedestrian",
+            "position": {
+                "location": {
+                    "x": -17.99858856201172,
+                    "y": 41.991756439208984,
+                    "z": 2.4815492630004883
+                },
+                "rotation": {
+                    "pitch": 0.6053869724273682,
+                    "yaw": 92.53667449951172,
+                    "roll": 0.00010005717922467738
+                }
+            },
+            "blueprint": {
+                "id": "walker.pedestrian.0003"
+            }
+        },
+        {
+            "type": "pedestrian",
+            "position": {
+                "location": {
+                    "x": -18.419767379760742,
+                    "y": 52.58515930175781,
+                    "z": 2.4210329055786133
+                },
+                "rotation": {
+                    "pitch": -10.016758918762207,
+                    "yaw": 91.96185302734375,
+                    "roll": 0.00009710279118735343
+                }
+            },
+            "blueprint": {
+                "id": "walker.pedestrian.0030"
+            }
+        },
+        {
+            "type": "pedestrian",
+            "position": {
+                "location": {
+                    "x": -18.890380859375,
+                    "y": 45.03841018676758,
+                    "z": 1.5191442966461182
+                },
+                "rotation": {
+                    "pitch": 3.903698682785034,
+                    "yaw": -82.58028411865234,
+                    "roll": 0.00010204926365986466
+                }
+            },
+            "blueprint": {
+                "id": "walker.pedestrian.0012"
+            }
+        },
+        {
+            "type": "pedestrian",
+            "position": {
+                "location": {
+                    "x": -30.222707748413086,
+                    "y": 10.887688636779785,
+                    "z": 2.1847474575042725
+                },
+                "rotation": {
+                    "pitch": -11.153254508972168,
+                    "yaw": -115.68235778808594,
+                    "roll": 0.0000944176790653728
+                }
+            },
+            "blueprint": {
+                "id": "walker.pedestrian.0004"
+            }
+        },
+        {
+            "type": "pedestrian",
+            "position": {
+                "location": {
+                    "x": -38.756561279296875,
+                    "y": 8.406180381774902,
+                    "z": 1.2420787811279297
+                },
+                "rotation": {
+                    "pitch": 2.559333324432373,
+                    "yaw": -164.7398681640625,
+                    "roll": 0.00010231476335320622
+                }
+            },
+            "blueprint": {
+                "id": "walker.pedestrian.0037"
+            }
+        },
+        {
+            "type": "pedestrian",
+            "position": {
+                "location": {
+                    "x": -38.205753326416016,
+                    "y": -11.891676902770996,
+                    "z": 2.181086301803589
+                },
+                "rotation": {
+                    "pitch": -13.580928802490234,
+                    "yaw": -76.94538116455078,
+                    "roll": 0.00009705573756946251
+                }
+            },
+            "blueprint": {
+                "id": "walker.pedestrian.0033"
+            }
+        },
+        {
+            "type": "pedestrian",
+            "position": {
+                "location": {
+                    "x": -28.75210189819336,
+                    "y": -22.207521438598633,
+                    "z": 2.17818284034729
+                },
+                "rotation": {
+                    "pitch": 2.968994379043579,
+                    "yaw": -2.068908929824829,
+                    "roll": 0.00009348362073069438
+                }
+            },
+            "blueprint": {
+                "id": "walker.pedestrian.0009"
+            }
+        },
+        {
+            "type": "pedestrian",
+            "position": {
+                "location": {
+                    "x": -18.920333862304688,
+                    "y": -31.994571685791016,
+                    "z": 1.0252971649169922
+                },
+                "rotation": {
+                    "pitch": 13.939629554748535,
+                    "yaw": 28.165546417236328,
+                    "roll": 0.00009764448623172939
+                }
+            },
+            "blueprint": {
+                "id": "walker.pedestrian.0017"
+            }
+        },
+        {
+            "type": "pedestrian",
+            "position": {
+                "location": {
+                    "x": -19.67390251159668,
+                    "y": -27.05276107788086,
+                    "z": 2.5811967849731445
+                },
+                "rotation": {
+                    "pitch": -6.782527923583984,
+                    "yaw": 83.02902221679688,
+                    "roll": 0.00011026816355297342
+                }
+            },
+            "blueprint": {
+                "id": "walker.pedestrian.0031"
+            }
+        },
+        {
+            "type": "infrastructure",
+            "position": {
+                "location": {
+                    "x": 0.7963331937789917,
+                    "y": -28.346925735473633,
+                    "z": 12.186951637268066
+                },
+                "rotation": {
+                    "pitch": -36.49525833129883,
+                    "yaw": 95.2843246459961,
+                    "roll": -0.0009494562982581556
+                }
+            },
+            "blueprint": null
+        },
+        {
+            "type": "infrastructure",
+            "position": {
+                "location": {
+                    "x": -3.2614455223083496,
+                    "y": 0.5563488006591797,
+                    "z": 12.696808815002441
+                },
+                "rotation": {
+                    "pitch": -11.975336074829102,
+                    "yaw": 88.1735610961914,
+                    "roll": -0.0009465165203437209
+                }
+            },
+            "blueprint": null
+        },
+        {
+            "type": "infrastructure",
+            "position": {
+                "location": {
+                    "x": -3.2614455223083496,
+                    "y": 0.5563488006591797,
+                    "z": 12.696808815002441
+                },
+                "rotation": {
+                    "pitch": -11.02792739868164,
+                    "yaw": -85.56539154052734,
+                    "roll": -0.0009463814785704017
+                }
+            },
+            "blueprint": null
+        },
+        {
+            "type": "infrastructure",
+            "position": {
+                "location": {
+                    "x": 0.7099149227142334,
+                    "y": 0.29621782898902893,
+                    "z": 12.30153751373291
+                },
+                "rotation": {
+                    "pitch": -10.205865859985352,
+                    "yaw": -2.625946521759033,
+                    "roll": -0.0009460083674639463
+                }
+            },
+            "blueprint": null
+        },
+        {
+            "type": "infrastructure",
+            "position": {
+                "location": {
+                    "x": -7.7404046058654785,
+                    "y": 0.6391898393630981,
+                    "z": 12.545106887817383
+                },
+                "rotation": {
+                    "pitch": -22.23250961303711,
+                    "yaw": -176.7632293701172,
+                    "roll": -0.0009459793800488114
+                }
+            },
+            "blueprint": null
+        },
+        {
+            "type": "infrastructure",
+            "position": {
+                "location": {
+                    "x": -64.65320587158203,
+                    "y": -1.2962031364440918,
+                    "z": 7.26283597946167
+                },
+                "rotation": {
+                    "pitch": -9.32384967803955,
+                    "yaw": 4.106086730957031,
+                    "roll": -0.0009460740257054567
+                }
+            },
+            "blueprint": null
+        },
+        {
+            "type": "infrastructure",
+            "position": {
+                "location": {
+                    "x": -2.3403067588806152,
+                    "y": 29.325719833374023,
+                    "z": 12.40369987487793
+                },
+                "rotation": {
+                    "pitch": -30.1579532623291,
+                    "yaw": -88.3536376953125,
+                    "roll": -0.0010387744987383485
+                }
+            },
+            "blueprint": null
+        }
+    ]
+}

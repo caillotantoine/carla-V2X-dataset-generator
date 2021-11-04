@@ -49,16 +49,20 @@ def main():
         print("Setting up world failled.\n{}".format(e))
         exit()
 
+    config = []
+
     print("===========================\n\tRendering....\n===========================")
     try:
-        while(True):
+        loop = True
+        while(loop):
             world.wait_for_tick()
-            action = input("What to do (c: car, p: pedestrian, i: infra, a: any, u: undo): ")
+            action = input("What to do (c: car, p: pedestrian, i: infra, a: any, u: undo, q: quit): ")
             spectator = world.get_spectator()
             loc = spectator.get_transform()
             print(loc)
             if action == 'a' or action == 'i':
                 print(loc)
+                config.append(("infrastructure", loc, None))
             if action == "c":
                 vehicle_bp = random.choice(blueprint_library.filter('vehicle.*.*'))
                 spawn = ROI.get_closest_spawnpoint(world, loc, all=True, sim_yaw=True)
@@ -66,6 +70,7 @@ def main():
                 try:
                     actor = world.spawn_actor(vehicle_bp, spawn)
                     actor_list.append(actor)
+                    config.append(("vehicle", spawn, vehicle_bp))
                 except Exception as e:
                     print(f"Error spawning vehicle {e}")
             
@@ -76,6 +81,7 @@ def main():
                 try:
                     actor = world.spawn_actor(vehicle_bp, loc)
                     actor_list.append(actor)
+                    config.append(("pedestrian", loc, vehicle_bp))
                 except Exception as e:
 
                     print(f"Error spawning vehicle {e}")
@@ -83,6 +89,11 @@ def main():
             if action == "u":
                 actor = actor_list.pop()
                 actor.destroy()
+                config.pop()
+
+            if action == "q":
+                loop = False
+
 
     
 
@@ -91,6 +102,32 @@ def main():
         settings.synchronous_mode = False
         traffic_manager.set_synchronous_mode(False)
         world.apply_settings(settings)
+
+        json_agents = []
+        for c in config:
+            T:Transform = c[1]
+            L:Location = T.location
+            R:Rotation = T.rotation
+            position = {"location": {"x": L.x,"y": L.y, "z": L.z}, "rotation":{"pitch": R.pitch,"yaw": R.yaw, "roll": R.roll}}
+            if c[2] == None:
+                bp = None
+            else:
+                bp = {"id": c[2].id}
+            json_agents.append({"type": c[0], "position": position, "blueprint": bp})
+
+        json_config = {
+            "world": WORLD,
+            "duration": DURATION, 
+            "tps": TPS, 
+            "agents": json_agents
+        }
+
+        print(json_config)
+        f = open('config/test1.json', "w")
+        JDump = json.dumps(json_config)
+        f.write(JDump)
+        f.close()
+            
         
     
 

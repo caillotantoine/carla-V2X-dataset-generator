@@ -84,7 +84,6 @@ class Attribute:
     def get_transform(self):
         if self.types[0] != 'walker':
             return self.actor.get_transform().get_matrix()
-        # return np.identity(4)
         return None
 
     def get_geoloc(self, world):

@@ -24,9 +24,9 @@ WORLD = 'Town03'
 
 vehicle_spawn_pts = []
 embed_sens_t = Transform(Location(x=0, y=0, z=1.9)) # position of the sensors on the vehicle
-# vehicle_spawn_pts.append(Transform(Location(x=4.503611, y=30.677336, z=1.495204), Rotation(pitch=3.871590, yaw=-82.755234, roll=-0.000122)))
-# vehicle_spawn_pts.append(Transform(Location(x=1.972299, y=57.928772, z=1.107717), Rotation(pitch=1.554264, yaw=-85.449158, roll=-0.000122)))
-# vehicle_spawn_pts.append(Transform(Location(x=-21.551464, y=7.175428, z=1.506268), Rotation(pitch=0.165127, yaw=54.112213, roll=-0.000122)))
+vehicle_spawn_pts.append(Transform(Location(x=4.503611, y=30.677336, z=1.495204), Rotation(pitch=3.871590, yaw=-82.755234, roll=-0.000122)))
+vehicle_spawn_pts.append(Transform(Location(x=1.972299, y=57.928772, z=1.107717), Rotation(pitch=1.554264, yaw=-85.449158, roll=-0.000122)))
+vehicle_spawn_pts.append(Transform(Location(x=-21.551464, y=7.175428, z=1.506268), Rotation(pitch=0.165127, yaw=54.112213, roll=-0.000122)))
 
 pedestrian_spawn_pts = []
 pedestrian_spawn_pts.append(Transform(Location(x=-18.057878, y=32.290249, z=2.474842), Rotation(pitch=1.811482, yaw=90.618484, roll=0.000001)))
