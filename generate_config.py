@@ -65,7 +65,7 @@ def main():
                 config.append(("infrastructure", loc, None))
             if action == "c":
                 vehicle_bp = random.choice(blueprint_library.filter('vehicle.*.*'))
-                spawn = ROI.get_closest_spawnpoint(world, loc, all=True, sim_yaw=True)
+                spawn = ROI.get_closest_spawnpoint(world, loc, all=True)
                 print(f"Chose loc : {spawn}")
                 try:
                     actor = world.spawn_actor(vehicle_bp, spawn)
@@ -123,7 +123,7 @@ def main():
         }
 
         print(json_config)
-        f = open('config/test1.json', "w")
+        f = open('config/test2.json', "w")
         JDump = json.dumps(json_config)
         f.write(JDump)
         f.close()

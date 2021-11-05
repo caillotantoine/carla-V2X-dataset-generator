@@ -5,9 +5,11 @@ import numpy as np
 from math import pi, tan
 
 import carla
-from utils.sensors import *
+# from utils.sensors import *
 import json
 
+
+from sensors import *
 
 def saveImageRGBAndT(world, image, sensor, path, parent=None):
     image.save_to_disk('%s/cameraRGB/%06d.png' % (path, image.frame))
