@@ -38,7 +38,6 @@ infra_spawn_pts.append(Transform(Location(x=0, y=0, z=13.0), Rotation(pitch=-20,
 
 def main():
     print("===========================\n\tSetup....\n===========================")
-    print("Number of frames required : {}".format(NFRAME))
 
     # Connecting to CARLA
     client = carla.Client('localhost', 2000)
@@ -49,22 +48,17 @@ def main():
     output_queue = queue.Queue()
     FIRST_hjvgckfhxddts = True
 
-    ROI = Zone(-120.0, 120.0, -120.0, 120.0)
-    # print(ROI.is_in_zone(vehicle_spawn_pts[0]))
-
     configurator = Config()
     configurator.read_json('./config/scenario_oclusion.json')
     (world, settings, traffic_manager) = configurator.setup_world(client=client)
     configurator.create_agents(world)
+    print(configurator)
     actor_list = configurator.spawn_actors(world, output_queue)
 
 
     print("===========================\n\tRendering....\n===========================")
     try:
-        for frame in tqdm(range(NFRAME)):
-            # actors = world.get_actors(actor_list)
-
-            # print("Queue size : {}, empty : {}".format(output_queue.qsize(), output_queue.empty()))
+        for frame in tqdm(range(configurator.get_nframes())):
             snapshots = []
             while not output_queue.empty():
                 snapshots.append(output_queue.get(True))
@@ -81,9 +75,6 @@ def main():
             for agent in configurator.get_agents():
                 agent.save_status(world, frame=frame)
 
-                # (attrib, data) = output_queue.clear()
-            #     attrib.save(data, frame)
-            # time.sleep(0.2)
     except Exception as e:
         print(f"Error {e}")
     finally:

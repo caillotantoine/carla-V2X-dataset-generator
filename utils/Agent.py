@@ -9,20 +9,29 @@ import json
 import os
 
 class Attribute:
-    def __init__(self, pose: Transform, bp, save_path: str, color_converter=carla.ColorConverter.Raw, maxspeed:float=0.0):
+    def __init__(self, pose: Transform, bp, save_path: str = None, color_converter=carla.ColorConverter.Raw, maxspeed:float=0.0):
         self.pose = pose
         self.bp = bp
-        self.save_path = save_path
         self.actor_id = None
         self.actor = None
         self.color_conv = color_converter
         self.types = self.bp.id.split('.')
         self.maxspeed = maxspeed
-        if self.types[0] == 'sensor':
-            self.save_path = self.save_path + self.types[1] + '_' + self.types[2] + '/'
-        if self.types[0] == 'vehicle':
-            self.save_path = self.save_path + "infos/"
+        self.save_path = save_path
+        if self.save_path != None:
+            if self.types[0] == 'sensor':
+                self.save_path = self.save_path + self.types[1] + '_' + self.types[2] + '/'
+            if self.types[0] == 'vehicle':
+                self.save_path = self.save_path + "infos/"
     
+    def set_save_path(self, save_path: str):
+        self.save_path = save_path
+        if self.save_path != None:
+            if self.types[0] == 'sensor':
+                self.save_path = self.save_path + self.types[1] + '_' + self.types[2] + '/'
+            if self.types[0] == 'vehicle':
+                self.save_path = self.save_path + "infos/"
+
     def spawn(self, world:carla.World, autopilot=None, attach_to=None, to_save:queue.Queue=None) -> None:
         if self.types[0] == 'controller':
             world.tick()
@@ -94,12 +103,17 @@ class Attribute:
     
         
 class Agent:
-    def __init__(self, type: str, agentN, path, vehicle=None, sensors=None):
+    def __init__(self, type: str, agentN, path: str, vehicle=None, sensors=None):
         self.type = type
         self.agentN = agentN
         self.vehicle:Attribute = vehicle
         self.sensors:List[Attribute] = sensors
         self.path = path
+
+        if self.vehicle != None:
+            self.vehicle.set_save_path(self.path)
+        for s in self.sensors:
+            s.set_save_path(save_path=self.path)
 
     def get_vehicle(self) -> Attribute:
         return self.vehicle

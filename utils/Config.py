@@ -19,9 +19,10 @@ else:
     from utils.Zone import *
 
 embed_sens_t = Transform(Location(x=0, y=0, z=1.9)) # position of the sensors on
+embed_high_sens_t = Transform(Location(x=0, y=0, z=2.9)) # position of the sensors on
 
 class Config:
-    def __init__(self, crossingWalker:float=30.0, zone:Zone=Zone(-120.0, 120.0, -120.0, 120.0)) -> None:
+    def __init__(self, path: str = "output", crossingWalker:float=30.0, zone:Zone=Zone(-120.0, 120.0, -120.0, 120.0)) -> None:
         self.tps = 1.0/30.0
         self.duration = 15.0
         self.nframe = int(self.duration/self.tps)+1 if self.duration%self.tps > 0.5 else int(self.duration/self.tps)
@@ -30,6 +31,7 @@ class Config:
         self.agents_des = []
         self.crossingWalker = crossingWalker
         self.ROI = zone
+        self.path = path
 
     def __str__(self):
         out:str = f"Config\n\ttps: {self.tps}\n\tduration: {self.duration}\n\tnframes: {self.nframe}\n\tworld: {self.world}\n\tcrossing walkers: {self.crossingWalker}\n\tAgents :\n"
@@ -83,20 +85,23 @@ class Config:
         camera_bp = get_KITTIcam_bp(blueprint_library)
         cameraSem_bp = get_KITTIcamSem_bp(blueprint_library)
 
+        oxts = []
+
         for agent_des in self.agents_des:
             atype = agent_des[0]
             bp = agent_des[1]
             transform = agent_des[2]
 
             if atype == "infrastructure":
+                out_path = "%s/I%03d/"%(self.path, n_infra)
                 s_attrib = []
-                s_attrib.append(Attribute(transform, camera_bp, "output/I%03d/"%n_infra))
-                s_attrib.append(Attribute(transform, cameraSem_bp, "output/I%03d/"%n_infra))
-                self.agents.append(Agent("infrastructure", n_infra, "output/I%03d/"%n_infra, sensors=s_attrib))
+                s_attrib.append(Attribute(transform, camera_bp))
+                s_attrib.append(Attribute(transform, cameraSem_bp))
+                self.agents.append(Agent("infrastructure", n_infra, out_path, sensors=s_attrib))
                 n_infra = n_infra+1
 
-
-            if atype == "pedestrian":
+            elif atype == "pedestrian":
+                out_path = "%s/P%03d/"%(self.path, n_walker)
                 walker_bp = blueprint_library.filter(bp)[0]
                 walker_controller_bp = world.get_blueprint_library().find('controller.ai.walker')
                 if walker_bp.has_attribute('is_invincible'):
@@ -105,14 +110,14 @@ class Config:
                     walker_speed = walker_bp.get_attribute('speed').recommended_values[1]
                 else:
                     walker_speed = 0.0
-                v_attrib = Attribute(transform, walker_bp, "output/P%03d/"%n_walker)
+                v_attrib = Attribute(transform, walker_bp)
                 s_attrib = []
-                s_attrib.append(Attribute(Transform(), walker_controller_bp, "output/P%03d/"%n_walker, maxspeed=walker_speed))
-                self.agents.append(Agent("pedestrian", n_walker, "output/P%03d/"%n_walker, vehicle=v_attrib, sensors=s_attrib))
+                s_attrib.append(Attribute(Transform(), walker_controller_bp, maxspeed=walker_speed))
+                self.agents.append(Agent("pedestrian", n_walker, out_path, vehicle=v_attrib, sensors=s_attrib))
                 n_walker = n_walker+1
 
-
-            if atype == "vehicle":
+            elif atype == "vehicle":
+                out_path = "%s/V%03d/"%(self.path, n_vehicle)
                 blueprint = blueprint_library.filter(bp)[0]
                 print(blueprint)
                 if blueprint.has_attribute('color'):
@@ -122,12 +127,34 @@ class Config:
                     driver_id = random.choice(blueprint.get_attribute('driver_id').recommended_values)
                     blueprint.set_attribute('driver_id', driver_id)
                 blueprint.set_attribute('role_name', 'autopilot')
-                v_attrib = Attribute(transform, blueprint, "output/V%03d/"%n_vehicle)
+                v_attrib = Attribute(transform, blueprint)
                 s_attrib = []
-                s_attrib.append(Attribute(embed_sens_t, camera_bp, "output/V%03d/"%n_vehicle))
-                s_attrib.append(Attribute(embed_sens_t, cameraSem_bp, "output/V%03d/"%n_vehicle))
-                self.agents.append(Agent("vehicle", n_vehicle, "output/V%03d/"%n_vehicle, v_attrib, s_attrib))
+                if bp.split('.')[2] == "carlacola" or bp.split('.')[2] == "ambulance":
+                    s_attrib.append(Attribute(embed_high_sens_t, camera_bp))
+                    s_attrib.append(Attribute(embed_high_sens_t, cameraSem_bp))
+                else:
+                    s_attrib.append(Attribute(embed_sens_t, camera_bp))
+                    s_attrib.append(Attribute(embed_sens_t, cameraSem_bp))
+                self.agents.append(Agent("vehicle", n_vehicle, out_path, v_attrib, s_attrib))
                 n_vehicle=n_vehicle+1
+            else:
+                print(atype + " is an unknown type")
+                out_path = None
+            oxts.append({"type": atype, "path": out_path})
+
+        
+
+        if not os.path.exists('%s/' % (self.path)):
+            try:
+                os.makedirs('%s/' % (self.path))
+            except OSError:
+                print('Failed creating directory %s' % ('%s/' % (self.path)))
+
+        out_config = {"agents": oxts}
+        f = open('%s/information.json' % (self.path), "w")
+        JDump = json.dumps(out_config)
+        f.write(JDump)
+        f.close()
 
     def spawn_actors(self, world, queue):
         self.actor_list = []
@@ -138,6 +165,10 @@ class Config:
 
     def get_agents(self):
         return self.agents
+
+    def get_nframes(self):
+        return self.nframe
+
                 
 
 if __name__ == '__main__':
