@@ -123,7 +123,7 @@ def main():
         }
 
         print(json_config)
-        f = open('config/test2.json', "w")
+        f = open('config/test3.json', "w")
         JDump = json.dumps(json_config)
         f.write(JDump)
         f.close()

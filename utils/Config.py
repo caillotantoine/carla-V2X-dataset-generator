@@ -1,7 +1,4 @@
 import json
-
-from tqdm.std import trange
-from Agent import Agent, Attribute
 import carla
 from carla import Transform, Location, Rotation
 from typing import Any, List
@@ -35,7 +32,7 @@ class Config:
         self.ROI = zone
 
     def __str__(self):
-        out:str = f"Config\n\ttps: {self.tps}\n\tduration: {self.duration}\n\tnframes: {self.nframe}\n\tworld: {self.world}\n\tAgents :\n"
+        out:str = f"Config\n\ttps: {self.tps}\n\tduration: {self.duration}\n\tnframes: {self.nframe}\n\tworld: {self.world}\n\tcrossing walkers: {self.crossingWalker}\n\tAgents :\n"
         for n,a in enumerate(self.agents_des):
             out = out + f"\t  {n:03} \t{a[0]}: {a[1]}\t {a[2]}\n"
         return out
@@ -74,7 +71,7 @@ class Config:
         settings.synchronous_mode = True
         traffic_manager.set_synchronous_mode(True)
         world.apply_settings(settings)
-        return world
+        return (world, settings, traffic_manager)
             
 
     def create_agents(self, world):
@@ -100,7 +97,7 @@ class Config:
 
 
             if atype == "pedestrian":
-                walker_bp = blueprint_library.filter(bp)
+                walker_bp = blueprint_library.filter(bp)[0]
                 walker_controller_bp = world.get_blueprint_library().find('controller.ai.walker')
                 if walker_bp.has_attribute('is_invincible'):
                     walker_bp.set_attribute('is_invincible', 'false')
@@ -116,7 +113,7 @@ class Config:
 
 
             if atype == "vehicle":
-                blueprint = blueprint_library.filter(bp)
+                blueprint = blueprint_library.filter(bp)[0]
                 print(blueprint)
                 if blueprint.has_attribute('color'):
                     color = random.choice(blueprint.get_attribute('color').recommended_values)

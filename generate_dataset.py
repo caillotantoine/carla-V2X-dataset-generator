@@ -8,6 +8,7 @@ import random
 import time
 import queue
 from typing import Any, List
+from utils.Config import Config
 
 from utils.weatherList import *
 from utils.spawnClosestTo import *
@@ -41,7 +42,7 @@ def main():
 
     # Connecting to CARLA
     client = carla.Client('localhost', 2000)
-    client.set_timeout(10.0)
+    client.set_timeout(30.0)
 
     actor_list = []
     spawn_points = []
@@ -50,90 +51,13 @@ def main():
 
     ROI = Zone(-120.0, 120.0, -120.0, 120.0)
     # print(ROI.is_in_zone(vehicle_spawn_pts[0]))
-    
 
-    try:
-        world = client.get_world()
-        world = client.load_world(WORLD) # Setting the world
+    configurator = Config()
+    configurator.read_json('./config/scenario_oclusion.json')
+    (world, settings, traffic_manager) = configurator.setup_world(client=client)
+    configurator.create_agents(world)
+    actor_list = configurator.spawn_actors(world, output_queue)
 
-        spectator = world.get_spectator()
-        spectator.set_transform(infra_spawn_pts[0])
-
-        traffic_manager = client.get_trafficmanager()
-
-        # Setting up the simulation in synchronous mode
-        settings = world.get_settings()
-        settings.fixed_delta_seconds = TPS
-        settings.synchronous_mode = True
-        traffic_manager.set_synchronous_mode(True)
-
-        world.apply_settings(settings)
-
-
-    except Exception as e:
-        print("Setting up world failled.\n{}".format(e))
-        exit()
-
-    print(ROI.get_Nrandom_spawnpoints(world, 10))
-
-    for v_spwn_pt in vehicle_spawn_pts:
-        spawn_points.append(ROI.get_closest_spawnpoint(world, v_spwn_pt))
-    for t in spawn_points:
-        print(t)
-
-    # Find the vehicle's blueprints
-    blueprint_library = world.get_blueprint_library()
-    c3 = blueprint_library.filter('vehicle.citroen.c3')[0]
-    model3 = blueprint_library.filter('vehicle.tesla.model3')[0]
-    a2 = blueprint_library.filter('vehicle.audi.a2')[0]
-    bps = [c3, model3, a2]
-
-    agents:list[Agent] = []
-    for n, transform in enumerate(spawn_points):
-        blueprint = bps[n]
-        print(blueprint)
-        if blueprint.has_attribute('color'):
-            color = random.choice(blueprint.get_attribute('color').recommended_values)
-            blueprint.set_attribute('color', color)
-        if blueprint.has_attribute('driver_id'):
-            driver_id = random.choice(blueprint.get_attribute('driver_id').recommended_values)
-            blueprint.set_attribute('driver_id', driver_id)
-        blueprint.set_attribute('role_name', 'autopilot')
-
-        camera_bp = get_KITTIcam_bp(blueprint_library)
-        cameraSem_bp = get_KITTIcamSem_bp(blueprint_library)
-
-        v_attrib = Attribute(transform, blueprint, "output/V%03d/"%n)
-        s_attrib = []
-        s_attrib.append(Attribute(embed_sens_t, camera_bp, "output/V%03d/"%n))
-        s_attrib.append(Attribute(embed_sens_t, cameraSem_bp, "output/V%03d/"%n))
-        agents.append(Agent("vehicle", n, "output/V%03d/"%n, v_attrib, s_attrib))
-
-    for n, transform in enumerate(infra_spawn_pts):
-        camera_bp = get_KITTIcam_bp(blueprint_library)
-        cameraSem_bp = get_KITTIcamSem_bp(blueprint_library)
-        s_attrib = []
-        s_attrib.append(Attribute(transform, camera_bp, "output/I%03d/"%n))
-        s_attrib.append(Attribute(transform, cameraSem_bp, "output/I%03d/"%n))
-        agents.append(Agent("infrastructure", n, "output/I%03d/"%n, sensors=s_attrib))
-
-    for n, transform in enumerate(pedestrian_spawn_pts):
-        walker_bp = random.choice(blueprint_library.filter('walker.*.*'))
-        walker_controller_bp = world.get_blueprint_library().find('controller.ai.walker')
-        if walker_bp.has_attribute('is_invincible'):
-            walker_bp.set_attribute('is_invincible', 'false')
-        if walker_bp.has_attribute('speed'):
-            walker_speed = walker_bp.get_attribute('speed').recommended_values[1]
-        else:
-            walker_speed = 0.0
-        v_attrib = Attribute(transform, walker_bp, "output/P%03d/"%n)
-        s_attrib = []
-        s_attrib.append(Attribute(Transform(), walker_controller_bp, "output/P%03d/"%n, maxspeed=walker_speed))
-        agents.append(Agent("pedestrian", n, "output/P%03d/"%n, vehicle=v_attrib, sensors=s_attrib))
-    
-    for agent in agents:
-        actor_list = actor_list + agent.spawn(world, output_queue)
-        print(agent.get_actors_list())
 
     print("===========================\n\tRendering....\n===========================")
     try:
@@ -154,7 +78,7 @@ def main():
             for (attrib, data) in snapshots:
                 attrib.save(data, frame)
 
-            for agent in agents:
+            for agent in configurator.get_agents():
                 agent.save_status(world, frame=frame)
 
                 # (attrib, data) = output_queue.clear()
