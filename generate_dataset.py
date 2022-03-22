@@ -22,6 +22,8 @@ DURATION = 15.0
 NFRAME = int(DURATION/TPS)+1 if DURATION%TPS > 0.5 else int(DURATION/TPS)
 WORLD = 'Town03'
 
+CONFIG_PATH = './config/inter_dense.json'
+
 
 vehicle_spawn_pts = []
 embed_sens_t = Transform(Location(x=0, y=0, z=1.9)) # position of the sensors on the vehicle
@@ -49,7 +51,7 @@ def main():
     FIRST_hjvgckfhxddts = True
 
     configurator = Config()
-    configurator.read_json('./config/scenario_oclusion.json')
+    configurator.read_json(CONFIG_PATH)
     (world, settings, traffic_manager) = configurator.setup_world(client=client)
     configurator.create_agents(world)
     print(configurator)
